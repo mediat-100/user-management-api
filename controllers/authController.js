@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 const User = require('../model/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
@@ -23,6 +24,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    changedPasswordAt: req.body.changedPasswordAt,
   });
 
   const token = signToken(newUser._id);
@@ -59,10 +61,44 @@ exports.login = async (req, res, next) => {
   });
 };
 
+exports.protect = catchAsync(async (req, res, next) => {
+  // check if token exists;
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(new AppError('Please log in to access this route!', 401));
+  }
+
+  // verify token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+
+  // check if user still exists
+  const currentUser = await User.findById(decoded.id);
+
+  if (!currentUser) {
+    return next(new AppError('User not found', 401));
+  }
+
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password, Please login again', 401)
+    );
+  }
+
+  req.user = currentUser;
+  next();
+});
+
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // get user from DB
-  const { email } = req.body;
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findById(req.user.id).select('+password');
 
   // check if current password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
@@ -82,7 +118,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updateUser = catchAsync(async (req, res, next) => {
-  const { id } = req.body;
   // Update user document without updating password
   if (req.body.password || req.body.passwordConfirm) {
     return next(new AppError("Password can't be updated in this route", 400));
@@ -90,7 +125,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 
   const filteredBody = filterObj(req.body, 'name', 'email');
   // Update user document
-  const updatedUser = await User.findByIdAndUpdate({ _id: id }, filteredBody, {
+  const updatedUser = await User.findByIdAndUpdate(req.user.id , filteredBody, {
     new: true,
     runValidators: true,
   });
@@ -104,8 +139,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-  const { email } = req.body;
-  await User.findOneAndDelete({ email });
+  await User.findByIdAndDelete(req.user.id);
 
   res.status(204).json({
     status: 'success',
