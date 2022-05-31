@@ -6,7 +6,7 @@ dotenv.config({ path: './config.env' });
 
 // Connecting to database
 const DB = process.env.MONGO_URI.replace(
-  '<password>',
+  '<PASSWORD>',
   process.env.MONGO_URI_PASSWORD
 );
 
@@ -24,6 +24,6 @@ mongoose
 const port = process.env.PORT || 8000;
 
 // Start Server
-app.listen(port, '127.0.0.1', () => {
+app.listen(port, () => {
   console.log(`App is running on port ${port}...`);
 });

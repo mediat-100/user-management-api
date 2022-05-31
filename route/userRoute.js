@@ -10,7 +10,13 @@ router.patch(
   authController.protect,
   authController.updatePassword
 );
-router.patch('/updateUser', authController.protect, authController.updateUser);
+router.patch(
+  '/updateUser',
+  authController.protect,
+  authController.uploadUserPhoto,
+  authController.resizeUserPhoto,
+  authController.updateUser
+);
 router.delete('/deleteUser', authController.protect, authController.deleteUser);
 
 module.exports = router;
