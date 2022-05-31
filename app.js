@@ -5,7 +5,9 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
-app.use(express.json()); //body-parser
+//body-parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 app.use(morgan('dev')); //logger middleware
 
