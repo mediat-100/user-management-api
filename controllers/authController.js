@@ -70,6 +70,8 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const token = signToken(newUser._id);
 
+  newUser.password = undefined;
+
   res.status(201).json({
     status: 'success',
     token,
@@ -155,9 +157,12 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   const token = signToken(user._id);
 
+  user.password = undefined;
+
   res.status(200).json({
     status: 'success',
     token,
+    data: user
   });
 });
 
@@ -186,7 +191,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 exports.deleteUser = catchAsync(async (req, res, next) => {
   await User.findByIdAndDelete(req.user.id);
 
-  res.status(204).json({
+  res.status(200).json({
     status: 'success',
     data: null,
   });
