@@ -5,17 +5,7 @@ const { promisify } = require('util');
 const User = require('../model/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-
-// Handles image upload without processing the image
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, './assets');
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split('/')[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   },
-// });
+const sendEmail = require('../utils/sendEmail');
 
 const multerStorage = multer.memoryStorage();
 
@@ -67,6 +57,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
+
+  // email response
+  await sendEmail({
+    email: newUser.email,
+    subject: "Registration Successful",
+    html: "<h3>Registration successful, login to continue<h3>"
+  })
 
   const token = signToken(newUser._id);
 
@@ -196,3 +193,14 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+// Handles image upload without processing the image
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, './assets');
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split('/')[1];
+//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+//   },
+// });
