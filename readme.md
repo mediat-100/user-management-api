@@ -23,5 +23,6 @@ A Simple User Management node-express REST API Application
 
 When a user successfully signup on the app, an email is sent to the user's email account.
 
-![](../../Documents/altSchool/Screenshot%202022-07-18%20180742.png)
 
+
+![Screenshot 2022-07-18 180742](https://user-images.githubusercontent.com/81367700/179628129-dce2ee09-d7a2-4c6e-8de2-3722f2b7a141.png)
