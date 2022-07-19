@@ -58,11 +58,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
+  const emailMessage = `Welcome ${newUser.name},\nRegistration successful, login to continue`
+
   // email response
   await sendEmail({
     email: newUser.email,
     subject: "Registration Successful",
-    html: "<h3>Registration successful, login to continue<h3>"
+    text: emailMessage
   })
 
   const token = signToken(newUser._id);
