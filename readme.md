@@ -25,4 +25,4 @@ When a user successfully signup on the app, an email is sent to the user's email
 
 
 
-![Screenshot 2022-07-18 180742](https://user-images.githubusercontent.com/81367700/179628129-dce2ee09-d7a2-4c6e-8de2-3722f2b7a141.png)
+![emailhandling](https://user-images.githubusercontent.com/81367700/179766852-f31d186d-5689-4227-81ce-bd3c4a635d7b.png)
